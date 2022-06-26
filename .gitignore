@@ -1,0 +1,13 @@
+# Jekyll
+_site/
+.sass-cache/
+.jekyll-cache/
+.jekyll-metadata
+
+# KDE
+.directory
+
+# messages and secrets
+_utils/*.conf
+messages/
+_messages/
