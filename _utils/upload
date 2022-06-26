@@ -1,0 +1,10 @@
+#!/bin/sh
+# Build and upload a site to Neocities
+CONFIG_FILE=_utils/upload.conf
+
+. "$CONFIG_FILE"
+
+jekyll build
+
+export NEOCITIES_API_KEY
+neocities push "$SITE_DIR"

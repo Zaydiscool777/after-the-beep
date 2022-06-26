@@ -1,0 +1,19 @@
+url: https://afterthebeep.tel
+
+permalink: /:title:output_ext
+timezone: America/New_York
+
+exclude:
+  - README.md
+  - LICENSE
+
+sass:
+  style: compressed
+
+port: 8000
+
+collections:
+  messages:
+    output: false
+
+page_excerpts: true

@@ -1,0 +1,14 @@
+# VoIP.ms settings
+[voicemail]
+api_username = xxxapiusernamexxx
+api_password = xxapipasswordxxx
+mailbox = 1234567890
+
+# output directories
+[site]
+document_path = _messages
+audio_path = messages
+
+# all values here will be added to front matter
+[document]
+style = new

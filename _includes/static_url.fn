@@ -1,0 +1,16 @@
+{%- comment -%}
+    Generate the root-relative path of a static site asset
+
+    Parameters:
+        include.dirname: name of subdirectory in static directory
+        include.filename: filename of the asset in the subdirectory
+{%- endcomment -%}
+
+
+{%- if include.dirname -%}
+    {%- assign _dir_segment = include.dirname | append: "/" -%}
+{%- else -%}
+    {%- assign _dir_segment = "" -%}
+{%- endif -%}
+
+{{- site.baseurl }}/static/{{ _dir_segment }}{{ include.filename -}}

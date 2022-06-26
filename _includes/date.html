@@ -1,0 +1,11 @@
+{%- comment -%}
+    A time tag formatted as a human date and time
+
+    Parameters:
+        include.date: document publish date
+{%- endcomment -%}
+
+
+{% assign _format = "%B %-d, %Y at %l:%M %p %Z" %}
+
+<time datetime="{{ include.date | date_to_xmlschema }}">{{ include.date | date: _format }}</time>

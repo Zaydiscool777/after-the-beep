@@ -1,0 +1,222 @@
+#!/usr/bin/env python3
+"""Fetch voicemails from VoIP.ms and store them as collection documents"""
+import base64
+import configparser
+import datetime
+import hashlib
+import json
+import os
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+
+import pytz
+
+
+FILE_ENCODING = 'utf-8'
+CONFIG_PATH = '_utils/fetchvm.conf'
+
+
+class Config:
+    """Configuration loaded from a file"""
+    def __init__(self, config_parser):
+        # extract voicemail settings
+        voicemail_config = config_parser['voicemail']
+        self.voicemail_api_username = voicemail_config['api_username']
+        self.voicemail_api_password = voicemail_config['api_password']
+        self.voicemail_mailbox = voicemail_config['mailbox']
+
+        # extract site settings
+        site_config = config_parser['site']
+        self.site_document_path = site_config['document_path']
+        self.site_audio_path = site_config['audio_path']
+
+        # extract document fields
+        try:
+            self.document_fields = list(config_parser['document'].items())
+        except KeyError:
+            self.document_fields = []
+
+    @classmethod
+    def load(cls, path=CONFIG_PATH, encoding=FILE_ENCODING):
+        config_parser = configparser.ConfigParser()
+        config_parser.read(path)
+        return cls(config_parser)
+
+
+class APIError(Exception):
+    """Error from API call"""
+    pass
+
+
+class Message:
+    """A voicemail message"""
+    def __init__(self, local_id, mailbox, folder, message_num, caller_id, date,
+            duration):
+        self.local_id = local_id
+        self.mailbox = mailbox
+        self.folder = folder
+        self.message_num = message_num
+        self.caller_id = caller_id
+        self.date = date
+        self.duration = duration
+
+
+class API:
+    """Voicemail portion of the VoIP.ms API"""
+    _API_URL = 'https://voip.ms/api/v1/rest.php'
+    _USER_AGENT = 'fetchvm'
+
+    def __init__(self, api_username, api_password):
+        self._api_username = api_username
+        self._api_password = api_password
+
+    def get_messages(self, mailbox):
+        # load mailbox to get timezone
+        voicemails_body = self._call('getVoicemails', mailbox=mailbox)
+        timezone_name = voicemails_body['voicemails'][0]['timezone']
+        timezone = pytz.timezone(timezone_name)
+
+        # load list of messages
+        messages = []
+        messages_body = self._call('getVoicemailMessages', mailbox=mailbox)
+        for message_info in messages_body['messages']:
+            mailbox = message_info['mailbox']
+            folder = message_info['folder']
+            caller_id = message_info['callerid']
+            message_num = message_info['message_num']
+            duration = message_info['duration']
+
+            # parse date and set to timezone of mailbox
+            date_str = message_info['date']
+            date = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+            date = timezone.localize(date)
+
+            # generate an ID that uniquely identifies the message locally
+            local_key = f'{mailbox}/{folder}/{caller_id}/{date.timestamp()}'
+            local_id = hashlib.md5(local_key.encode('utf-8')).hexdigest()
+
+            message = Message(
+                local_id, mailbox, folder, message_num, caller_id,
+                date, duration)
+            messages.append(message)
+
+        return messages
+
+    def download_audio(self, message, audio_path):
+        """Download a voicemail WAV file"""
+        file_body = self._call('getVoicemailMessageFile',
+            mailbox=message.mailbox, folder=message.folder,
+            message_num=message.message_num, format='wav')
+        wav_base64 = file_body['message']['data']
+        wav_bytes = base64.b64decode(wav_base64)
+        with open(audio_path, 'wb') as audio_file:
+            audio_file.write(wav_bytes)
+
+    def delete_message(self, message):
+        """Delete a voicemail message"""
+        self._call('delMessages',
+            mailbox=message.mailbox, folder=message.folder,
+            message_num=message.message_num)
+
+    def _call(self, method, **kwargs):
+        """Make a call to an API method with kwargs as query params"""
+        query_params = {
+            'api_username': self._api_username,
+            'api_password': self._api_password,
+            'method': method
+        }
+        query_params.update(kwargs)
+        url = self._API_URL + '?' + urllib.parse.urlencode(query_params)
+        request = urllib.request.Request(url,
+            headers={'User-Agent': self._USER_AGENT})
+
+        try:
+            # make call and return parsed body
+            with urllib.request.urlopen(request) as response:
+                body = self._extract_body(response)
+
+                # report API error
+                if body['status'] != 'success':
+                    message = body.get('message', str(body))
+                    raise APIError(message)
+
+                return body
+
+        except urllib.error.HTTPError as error:
+            raise APIError(error)
+
+    @classmethod
+    def _extract_body(cls, response):
+        """Parse body of a JSON or plain text HTTP response"""
+        info = response.info()
+        encoding = info.get_content_charset('utf-8')
+        body = response.read().decode(encoding)
+        return json.loads(body)
+
+
+def write_document(path, fields, encoding=FILE_ENCODING):
+    """Save fields to a Markdown file as yaml front matter"""
+    with open(path, 'w', encoding=encoding) as document_file:
+        document_file.write('---\n')
+        for field_name, field_value in fields:
+            # format date
+            if isinstance(field_value, datetime.datetime):
+                field_value = field_value.strftime('%Y-%m-%d %H:%M:%S %z')
+            # quote string
+            elif isinstance(field_value, str):
+                field_value = f'"{field_value}"'
+
+            document_file.write(f'{field_name}: {field_value}\n')
+        document_file.write('---\n')
+
+
+def main():
+    config = Config.load()
+    api = API(config.voicemail_api_username, config.voicemail_api_password)
+
+    try:
+        print("Fetching voicemails...")
+        messages = api.get_messages(config.voicemail_mailbox)
+        print(f"You have {len(messages)} new messages.")
+
+        # message_num is an index that changes when messages are deleted
+        # iterating from high to low allows deleting during iteration without
+        # invalidating message_num on the remaining messages
+        messages = sorted(messages, key=lambda m: m.message_num, reverse=True)
+
+        for message in messages:
+            print(f"Message {message.message_num}:")
+            print(f" -> From {message.caller_id}")
+            print(f" -> Received {message.date}")
+            print(f" -> Duration {message.duration}")
+
+            audio_filename = message.local_id + '.wav'
+            audio_path = os.path.join(config.site_audio_path, audio_filename)
+            print(f" -> Downloading audio to \"{audio_path}\" ...")
+            api.download_audio(message, audio_path)
+
+            document_path = os.path.join(
+                config.site_document_path, message.local_id + '.md')
+            print(f" -> Saving metadata to \"{document_path}\" ...")
+            document_fields = [
+                ('local_id', message.local_id),
+                ('caller_id', message.caller_id),
+                ('date', message.date),
+                ('audio', audio_filename),
+            ] + config.document_fields
+            write_document(document_path, document_fields)
+
+            print(" -> Deleting message from server...")
+            api.delete_message(message)
+
+            print(" -> Done.")
+
+    except APIError as error:
+        print('Error: ' + str(error))
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

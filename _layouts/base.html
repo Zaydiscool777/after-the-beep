@@ -1,0 +1,58 @@
+{%- comment -%}
+    Base HTML document and root site markup
+
+    Parameters:
+        page.title: page title
+        page.no_title: if true omit page title from title tag
+    Configuration:
+        site.data.site.charset: charset of site, ex: utf-8
+        site.data.site.locale: locale of site, ex: en_US
+        site.data.site.title: site title placed in head>title tag
+        site.data.site.owner: name of site owner
+        site.data.site.email: email address of site owner
+        site.data.site.neocities: neocities site name
+        site.data.site.api_url: URL of site API
+{%- endcomment -%}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="{{ site.data.site.charset }}">
+        <title>{% unless page.no_title %}{{ page.title | escape }} - {% endunless %}{{ site.data.site.title | escape }}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=10.0" />
+        <link rel="stylesheet" type="text/css" href="{% include static_url.fn filename='styles.css' %}" />
+        <link rel="icon" type="image/x-icon" href="{% include static_url.fn filename='favicon.ico' %}" />
+        <link rel="apple-touch-icon" type="image/gif" sizes="128x128" href="{% include static_url.fn filename='favicon-128.gif' %}" />
+        <meta property="og:locale" content="{{ site.data.site.locale }}" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="{{ site.data.site.title | escape }}"/>
+        <meta property="og:title" content="{{ page.title | escape }}" />
+        <meta property="og:description" content="{{ page.excerpt | strip_html | normalize_whitespace | escape }}" />
+        <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
+        <meta property="og:image" content="{%- include static_url.fn filename='cover.gif' -%}" />
+    </head>
+    <body class="base">
+        <header class="header">
+            <div class="header-banner">{{ site.data.site.title | escape }}</div>
+        </header>
+        <div class="body">{{ content }}</div>
+        <footer class="footer">
+            <div class="footer-notice">
+                <span class="footer-line">Site is <a href="{{ site.data.site.source_repo }}">open source</a>.</span>
+                <span class="footer-line">Contact <a href="mailto:{{ site.data.site.email }}"> {{ site.data.site.owner }}</a> if you have questions.</span>
+            </div>
+            <a id="counter" class="footer-counter" href="https://neocities.org/site/{{ site.data.site.neocities }}"></a>
+        </footer>
+        <script src="{% include static_url.fn filename='counter.js' %}"></script>
+        <script>
+            (function() {
+                var URL_TEMPLATE = '{% include static_url.fn dirname="digits" filename="{digit}.gif" %}';
+                function render(digit) {
+                    var src = URL_TEMPLATE.replace('{digit}', digit);
+                    return '<img src="' + src + '" alt="' + digit + '" />';
+                }
+                counter.init('#counter', render, '{{ site.data.site.api_url }}', '{{ site.data.site.neocities }}');
+            })();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,12 @@
+charset: utf-8
+locale: en_US
+
+title: After the Beep
+owner: Blaine Murphy
+copyright: 2022
+email: operator@afterthebeep.tel
+
+source_repo: https://gitlab.com/unixispower/after-the-beep
+
+api_url: https://api.blaines.world
+neocities: afterthebeep
