@@ -1,5 +1,5 @@
-# Blaine's World
-[Personal website of Blaine Murphy](https://blaines.world/) built using
+# After the Beep
+[After the Beep](https://afterthebeep.tel/) built using
 [Jekyll](https://jekyllrb.com/) and hosted on
 [Neocities](https://neocities.org/).
 
@@ -17,8 +17,8 @@ Open a web browser to `localhost:8000` to access the site.
 
 
 ## Scripts
-Some shell scripts are included to ease graphics changes. These require a POSIX
-compatible `sh` and graphics utilities.
+Scripts are included for site management. These require a POSIX
+compatible `sh` and Python 3.
 
 ### fixgif
 The `fixgif` script is used to ensure a GIFs is optimized as well as looped
@@ -30,8 +30,8 @@ a weird format that trips viewer implementations up. This utility requires
 $ ./_utils/fixgif static/bullet.gif
 ```
 
-### vid2gif
-The `vid2gif` script is used to convert a video into an animated GIF. This
+### fetchvm
+The `fetchvm` script is used to convert a video into an animated GIF. This
 utility requires [FFmpeg](https://ffmpeg.org/) to be installed.
 
 ```shell

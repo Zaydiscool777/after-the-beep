@@ -15,5 +15,7 @@ port: 8000
 collections:
   messages:
     output: false
+  messages1:
+    output: false
 
 page_excerpts: true

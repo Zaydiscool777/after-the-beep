@@ -1,5 +1,5 @@
 ---
 layout: mailbox
-title: After the Beep
+title: Voicemail INBOX
 no_title: true
 ---

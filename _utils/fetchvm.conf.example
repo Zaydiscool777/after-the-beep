@@ -11,4 +11,5 @@ audio_path = messages
 
 # all values here will be added to front matter
 [document]
-style = new
+published = true
+memo = New

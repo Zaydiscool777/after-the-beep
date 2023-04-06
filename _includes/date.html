@@ -6,6 +6,6 @@
 {%- endcomment -%}
 
 
-{% assign _format = "%B %-d, %Y at %l:%M %p %Z" %}
+{%- assign _format = "%Y/%m/%d %l:%M %p %Z" -%}
 
 <time datetime="{{ include.date | date_to_xmlschema }}">{{ include.date | date: _format }}</time>

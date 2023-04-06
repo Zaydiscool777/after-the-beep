@@ -14,6 +14,7 @@
         site.data.site.api_url: URL of site API
 {%- endcomment -%}
 
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -32,26 +33,24 @@
         <meta property="og:image" content="{%- include static_url.fn filename='cover.gif' -%}" />
     </head>
     <body class="base">
-        <header class="header">
-            <div class="header-banner">{{ site.data.site.title | escape }}</div>
-        </header>
-        <div class="body">{{ content }}</div>
-        <footer class="footer">
-            <div class="footer-notice">
-                <span class="footer-line">Site is <a href="{{ site.data.site.source_repo }}">open source</a>.</span>
-                <span class="footer-line">Contact <a href="mailto:{{ site.data.site.email }}"> {{ site.data.site.owner }}</a> if you have questions.</span>
-            </div>
-            <a id="counter" class="footer-counter" href="https://neocities.org/site/{{ site.data.site.neocities }}"></a>
-        </footer>
+        <div class="base-window">
+            <header class="base-header">
+                <div class="base-title">{{ page.title | escape }}</div>
+            </header>
+            <div class="base-body">{{ content }}</div>
+            <footer class="base-footer">
+                <div class="base-notice">
+                    <span>Site is <a href="{{ site.data.site.source_repo }}">open source</a>.</span>
+                    <span>Contact <a href="mailto:{{ site.data.site.email }}"> {{ site.data.site.owner }}</a> with questions.</span>
+                </div>
+                <div class="base-counter">Visitors: <a id="counter" href="https://neocities.org/site/{{ site.data.site.neocities }}"></a></div>
+            </footer>
+        </div>
         <script src="{% include static_url.fn filename='counter.js' %}"></script>
         <script>
             (function() {
-                var URL_TEMPLATE = '{% include static_url.fn dirname="digits" filename="{digit}.gif" %}';
-                function render(digit) {
-                    var src = URL_TEMPLATE.replace('{digit}', digit);
-                    return '<img src="' + src + '" alt="' + digit + '" />';
-                }
-                counter.init('#counter', render, '{{ site.data.site.api_url }}', '{{ site.data.site.neocities }}');
+                counter.init('#counter', function(digit) { return digit; },
+                    '{{ site.data.site.api_url }}', '{{ site.data.site.neocities }}');
             })();
         </script>
     </body>

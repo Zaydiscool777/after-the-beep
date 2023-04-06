@@ -1,0 +1,53 @@
+
+// site layout
+.base {
+    max-width: $column-width;
+    margin: 0 auto;
+    padding: $wide-gap;
+
+    &-window {
+        background-color: $window-bg-color;
+        margin-bottom: $narrow-gap;
+        padding: $narrow-gap;
+        @include outset-border;
+    }
+    &-title {
+        color: $window-title-color;
+        background: url("controls.gif") $window-title-bar-color;
+        background-position: top $narrow-gap right $narrow-gap;
+        background-repeat: no-repeat;
+        height: 14px;
+        padding: $narrow-gap;
+        font-weight: bold;
+    }
+
+    &-header {
+
+
+    }
+
+    &-body {
+        margin: $narrow-gap 0;
+    }
+
+    &-footer {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: stretch;
+        gap: $narrow-gap;
+    }
+    &-footer-link {
+        color: $meta-color;
+    }
+    &-notice, &-counter {
+        flex: 1 1 auto;
+        padding: $narrow-gap;
+        @include inset-border;
+    }
+    &-notice {
+
+    }
+    &-counter {
+
+    }
+}

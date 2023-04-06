@@ -1,0 +1,70 @@
+@mixin outset-border {
+    border: 2px solid;
+    border-color:
+        $window-border-highlight-color
+        $window-border-shadow-color
+        $window-border-shadow-color
+        $window-border-highlight-color;
+    border-image: url("outset.gif") 2 stretch;
+}
+
+@mixin inset-border {
+    border: 2px solid;
+    border-color:
+        $window-border-shadow-color
+        $window-border-highlight-color
+        $window-border-highlight-color
+        $window-border-shadow-color;
+    border-image: url("inset.gif") 2 stretch;
+}
+
+@mixin scroll-wrapper {
+    $scrollbar-size: 16px;
+
+    overflow: auto;
+    scrollbar-color: $window-bg-color $scrollbar-bg-color;
+    scrollbar-width: auto;
+
+    &::-webkit-scrollbar {
+        width: $scrollbar-size;
+        height: $scrollbar-size;
+    }
+    &::-webkit-scrollbar-button {
+        background: $window-bg-color center no-repeat;
+        width: $scrollbar-size;
+        height: $scrollbar-size;
+        @include outset-border;
+
+        &:horizontal:increment {
+            background-image: url("arrow-right.gif");
+        }
+        &:horizontal:decrement {
+            background-image: url("arrow-left.gif");
+        }
+        &:vertical:increment {
+            background-image: url("arrow-down.gif");
+        }
+        &:vertical:decrement {
+            background-image: url("arrow-up.gif");
+        }
+    }
+    &::-webkit-scrollbar-thumb {
+        background: $window-bg-color;
+        @include outset-border;
+    }
+    &::-webkit-scrollbar-track {
+        background: url("track-bg.gif") $scrollbar-bg-color;
+    }
+    &::-webkit-scrollbar-corner {
+        background: $window-bg-color;
+    }
+}
+
+@mixin button-icon {
+    &:disabled {
+        background-image: url("play-disabled.gif");
+    }
+    &.playing {
+        background-image: url("pause.gif");
+    }
+}

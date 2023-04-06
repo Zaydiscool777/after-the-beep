@@ -9,11 +9,56 @@ layout: base
 {%- endcomment -%}
 
 
-{%- for _message in site.messages reversed -%}
-<div class="mailbox">
-    <div id="{{ _message.local_id }}" class="mailbox-message mailbox-message-{{ _message.style }}">
-        {% include date.html date=_message.date %}<br/>
-        <audio src="{{ site.baseurl }}/messages/{{ _message.audio }}" controls></audio>
+<div id="mailbox" class="mailbox">
+    <a class="mailbox-number" href="tel:{{ site.data.site.number }}">
+        <img class="mailbox-image" src="{% include static_url.fn filename='number.gif' %}" alt="{{ site.data.site.number }}" />
+    </a>
+    <div class="mailbox-controls">
+        <div class="mailbox-infobox">
+            Position
+            <div class="mailbox-position">0:00</div>
+        </div>
+        <div class="mailbox-visualizer"></div>
+        <div class="mailbox-infobox">
+            Duration
+            <div class="mailbox-duration">0:00</div>
+        </div>
+    </div>
+    <div class="mailbox-controls">
+        <div class="mailbox-state"></div>
+        <input class="mailbox-seek" type="range" min="0" max="100" value="0" step="0.01" />
+    </div>
+    <div class="mailbox-controls">
+        <button class="mailbox-prev"></button>
+        <button class="mailbox-play"></button>
+        <button class="mailbox-stop"></button>
+        <button class="mailbox-next"></button>
+        <div class="mailbox-spacer"></div>
+        <button class="mailbox-mute"></button>
+        <input class=" mailbox-volume" type="range" min="0" max="100" value="100" />
+    </div>
+    <div class="mailbox-messages">
+        <table>
+            <tr>
+                <th class="mailbox-header-narrow">#</th>
+                <th class="mailbox-header-narrow">Date</th>
+                <th class="mailbox-header-narrow">Length</th>
+                <th>Memo</th>
+            </tr>
+            {%- for message in site.messages reversed %}
+            <tr class="mailbox-message" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
+                <td class="mailbox-message-number">{{ forloop.length | minus: forloop.index0 }}</td>
+                <td class="mailbox-message-date">{% include date.html date=message.date %}</td>
+                <td class="mailbox-message-duration">{{ message.duration }}</td>
+                <td class="mailbox-message-memo">{{ message.memo | escape }}</td>
+            </tr>
+            {%- endfor %}
+        </table>
     </div>
 </div>
-{%- endfor -%}
+<script src="{% include static_url.fn filename='mailbox.js' %}"></script>
+<script>
+    (function() {
+        mailbox.init('#mailbox');
+    })();
+</script>

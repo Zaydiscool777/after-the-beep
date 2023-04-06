@@ -3,7 +3,7 @@
  * This script requires the use of a CORS proxy to be used on Neocities pages.
  */
 var counter = (function() {
-    var INFO_PATH_TEMPLATE = '/info?sitename={siteName}'
+    var INFO_PATH_TEMPLATE = '/info?sitename={siteName}';
 
     // make an async HTTP GET request
     function sendRequest(method, url, onDone) {
