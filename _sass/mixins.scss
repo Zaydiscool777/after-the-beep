@@ -60,11 +60,35 @@
     }
 }
 
-@mixin button-icon {
-    &:disabled {
-        background-image: url("play-disabled.gif");
+@mixin party-text($colors, $duration, $stretch, $deflection) {
+    $name: str-slice("#{&}", 2);  // remove "." prefix from selector
+    $colors: append($colors, nth($colors, 1));  // start and end on same color
+    $frame-count: length($colors);
+
+    display: inline-block;
+
+    @keyframes #{$name}-color {
+        @for $i from 1 through $frame-count {
+            $percent: 100% / ($frame-count - 1) * ($i - 1);
+            $color: nth($colors, $i);
+            #{$percent} {
+                color: $color;
+            }
+        }
     }
-    &.playing {
-        background-image: url("pause.gif");
+
+    @keyframes #{$name}-motion {
+        0% { transform: translateY(-$deflection); }
+        100% { transform: translateY($deflection); }
+    }
+
+    animation: $duration linear infinite #{$name}-color,
+        ($duration / 2) ease-in-out infinite alternate #{$name}-motion;
+
+    $delay-count: $frame-count * $stretch;
+    @for $i from 1 through $delay-count {
+        &:nth-child(#{$delay-count}n + #{$i}) {
+            animation-delay: -$duration / $delay-count * ($i - 1);
+        }
     }
 }

@@ -5,7 +5,11 @@ $meta-color: #666666;
 //$heading-color: #000000;
 $text-color: #000000;
 $link-color: #0000ff;
-//$code-color: #000000;
+
+//$marquee-colors: cyan, magenta, yellow;
+//$marquee-colors: #ccbbf2, #d8e8f2, #9bf2e2, #72f2b6, #f2e7ae;
+$marquee-colors: hsl(0, 100%, 75%), hsl(60, 100%, 75%), hsl(120, 100%, 75%), hsl(180, 100%, 75%), hsl(240, 100%, 75%), hsl(300, 100%, 75%);
+//$marquee-colors: #00ff99, #00ffcc, #0080ff;
 
 $window-title-color: #ffffff;
 $window-title-bar-color: #00007b;
@@ -25,9 +29,9 @@ $heading-line-height: 1.0;
 $text-font-family: "DejaVu Serif", sans-serif;
 $text-font-size: 11pt;
 $text-line-height: 1.1;
-//$code-font-family: "Courier Prime", "Courier New", monospace;
-//$code-font-size: 14pt;
-//$code-line-height: 1.0;
+$code-font-family: "Flexi IBM VGA False", monospace;
+$code-font-size: 14pt;
+$code-line-height: 1.0;
 
 // gaps and sizes
 $narrow-gap: 2px;

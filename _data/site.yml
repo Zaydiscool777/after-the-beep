@@ -3,7 +3,7 @@ locale: en_US
 
 title: After the Beep
 number: '+14426672337'
-owner: The Operator
+owner: the operator
 email: operator@afterthebeep.tel
 
 source_repo: https://gitlab.com/unixispower/after-the-beep

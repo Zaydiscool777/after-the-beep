@@ -1,0 +1,19 @@
+{%- comment -%}
+    Prepare text for use with the party-text scss mixin
+
+    Parameters:
+        include.class: pass to add suffix to
+        include.text: text to stylize
+{%- endcomment -%}
+
+
+{%- assign _characters = include.text | split: "" -%}
+{%- for _character in _characters -%}
+    <span class="{{ include.class }}">
+    {%- if _character == " " -%}
+        &nbsp;
+    {%- else -%}
+        {{- _character -}}
+    {%- endif -%}
+    </span>
+{%- endfor -%}

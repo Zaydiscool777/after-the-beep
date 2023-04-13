@@ -1,0 +1,23 @@
+#!/bin/sh
+# Convert a font to WOFF and strip all non-latin characters
+# Requires python-fonttools and python-zopfli to be installed
+# Usage: mkwebfont <font_file>
+
+# taken from https://en.wikipedia.org/wiki/Latin_script_in_Unicode
+UNICODES="0000-007F"            # ASCII
+UNICODES="$UNICODES,0080-00FF"  # Latin-1 Supplement
+UNICODES="$UNICODES,0100-017F"  # Latin Extended-A
+UNICODES="$UNICODES,0180-024F"  # Latin Extended-B
+UNICODES="$UNICODES,2070-209F"  # Superscripts and Subscripts
+UNICODES="$UNICODES,2100-214F"  # Letterlike Symbols
+UNICODES="$UNICODES,2150-218F"  # Number Forms
+
+input_font="$1"
+output_woff="$1.woff"
+
+
+#which pyftsubset
+pyftsubset "$input_font" \
+    --unicodes="$UNICODES" \
+    --flavor=woff --with-zopfli \
+    --output-file="$output_woff"

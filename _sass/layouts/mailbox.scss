@@ -7,17 +7,19 @@
     &-image {
         max-width: 100%;
     }
-    &-marquee {
-        margin: 0 $narrow-gap;
-        @include inset-border;
-    }
 
-    &-visualizer {
-        flex: 1 0 auto;
+    &-marquee {
+        flex: 1 1 auto;
         height: 48px;
         margin: 0 $narrow-gap;
-        background-color: #000000;
+        background: url("marquee-bg.gif") #000000;
+        font-size: 32px;
+        line-height: 48px;
         @include inset-border;
+    }
+    &-letter {
+        font-family: $code-font-family;
+        @include party-text($marquee-colors, 2s, 3, 4px);
     }
     &-infobox {
         align-self: stretch;
@@ -28,14 +30,6 @@
         gap: $medium-gap;
         padding: $medium-gap;
         @include inset-border;
-    }
-    &-position, &-duration {
-
-
-        // $height: $input-height - 4px;
-        // height: $height;
-        // line-height: $height;
-
     }
     &-state {
         $state-size: 20px;
@@ -64,7 +58,6 @@
     }
     &-seek {
         flex: 1 0 auto;
-        //margin: 0 $wide-gap;
     }
     &-prev, &-stop, &-play, &-next {
         flex: 0 1 auto;
@@ -113,19 +106,6 @@
     &-spacer {
         flex: 1 1 0;
     }
-    /*margin: $wide-gap 0;
-
-    &-item {
-        margin: $medium-gap 0;
-
-        &:before, &:last-child:after {
-            content: "";
-            display: block;
-            height: 2px;
-            background: url("divider-2.gif") no-repeat center;
-            margin: $medium-gap 0;
-        }
-    }*/
 
     &-header-narrow {
         width: 0;

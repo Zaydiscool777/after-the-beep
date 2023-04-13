@@ -5,6 +5,7 @@ var mailbox = (function() {
     // create an object representing the mailbox DOM
     function createMailbox(selector) {
         var rootElement = document.querySelector(selector);
+        var marqueeElement = rootElement.querySelector('.mailbox-marquee');
         var stateElement = rootElement.querySelector('.mailbox-state');
         var positionElement = rootElement.querySelector('.mailbox-position');
         var durationElement = rootElement.querySelector('.mailbox-duration');
@@ -13,7 +14,7 @@ var mailbox = (function() {
 
         // format a second duration to m:ss
         function formatDuration(duration) {
-            duration = Math.round(duration);
+            duration = Math.floor(duration);
             var minutes = Math.floor(duration / 60);
             var seconds = duration % 60;
             return minutes + ':' + seconds.toString().padStart(2, '0');
@@ -21,10 +22,7 @@ var mailbox = (function() {
 
         // set state class of state element
         function setState(state) {
-            stateElement.classList.remove('loading');
-            stateElement.classList.remove('playing');
-            stateElement.classList.remove('paused');
-            stateElement.classList.remove('error');
+            stateElement.classList.remove('loading', 'playing', 'paused', 'error');
             stateElement.classList.add(state);
         }
 
@@ -312,6 +310,7 @@ var mailbox = (function() {
                 mailbox.volume(volume);
                 audio.volume = volume;
                 mailbox.enable(true);
+                mailbox.stop();
 
                 var firstMessage = mailbox.messages[0];
                 selectMessage(firstMessage);

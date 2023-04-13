@@ -1,0 +1,7 @@
+#!/bin/sh
+# Generate voicemail prompt using Festival TTS
+VOICE=cmu_us_awb_cg
+PROMPT="Please leave a message after the beep."
+PROMPT_FILE=_prompt.wav
+
+echo "$PROMPT" | text2wave -eval "(voice_$VOICE)" -o "$PROMPT_FILE"
