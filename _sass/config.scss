@@ -5,11 +5,14 @@ $meta-color: #666666;
 //$heading-color: #000000;
 $text-color: #000000;
 $link-color: #0000ff;
-
-//$marquee-colors: cyan, magenta, yellow;
-//$marquee-colors: #ccbbf2, #d8e8f2, #9bf2e2, #72f2b6, #f2e7ae;
-$marquee-colors: hsl(0, 100%, 75%), hsl(60, 100%, 75%), hsl(120, 100%, 75%), hsl(180, 100%, 75%), hsl(240, 100%, 75%), hsl(300, 100%, 75%);
-//$marquee-colors: #00ff99, #00ffcc, #0080ff;
+$marquee-bg-color: #000000;
+$marquee-colors:
+    hsl(0, 100%, 75%),
+    hsl(60, 100%, 75%),
+    hsl(120, 100%, 75%),
+    hsl(180, 100%, 75%),
+    hsl(240, 100%, 75%),
+    hsl(300, 100%, 75%);
 
 $window-title-color: #ffffff;
 $window-title-bar-color: #00007b;
@@ -44,8 +47,3 @@ $input-height: 24px;
 
 // media queries
 $column-width: 640px;
-//$small-viewport-width: $column-width + 2 * $medium-gap;
-//$small-media-query: "only screen and (max-width: #{$small-viewport-width})";
-
-// media constraints
-//$media-preview-width: 480px;

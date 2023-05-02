@@ -1,0 +1,7 @@
+#!/bin/sh
+# Fix animated gifs designed for old browsers like Netscape
+# Usage: fixgif file...
+
+gifsicle --verbose --batch \
+    --no-comments --colors=256 --loopcount --optimize=3 \
+    "$@"
