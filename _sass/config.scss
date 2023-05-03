@@ -14,6 +14,9 @@ $marquee-colors:
     hsl(240, 100%, 75%),
     hsl(300, 100%, 75%);
 
+$error-color: #ffffff;
+$error-bg-color: #ff0000;
+
 $window-title-color: #ffffff;
 $window-title-bar-color: #00007b;
 $window-bg-color: #bfbfbf;
@@ -36,6 +39,10 @@ $code-font-family: "Flexi IBM VGA False", monospace;
 $code-font-size: 14pt;
 $code-line-height: 1.0;
 
+// cursors
+$arrow-cursor: url("arrow.cur"), default;
+$hand-cursor: url("hand.cur"), pointer;
+
 // gaps and sizes
 $narrow-gap: 2px;
 $medium-gap: 4px;
@@ -47,7 +54,3 @@ $input-height: 24px;
 
 // media queries
 $column-width: 640px;
-
-// cursors
-$arrow-cursor: url("arrow.cur"), default;
-$hand-cursor: url("hand.cur"), pointer;
