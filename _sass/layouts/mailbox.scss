@@ -116,7 +116,4 @@
         @include scroll-wrapper;
         @include inset-border;
     }
-    &-message {
-        cursor: url("ARROW_1.CUR"), pointer;
-    }
 }
