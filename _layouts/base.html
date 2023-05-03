@@ -4,6 +4,7 @@
     Parameters:
         page.title: page title
         page.no_title: if true omit page title from title tag
+        page.marquee: if present this will be used as a page description
     Configuration:
         site.data.site.charset: charset of site, ex: utf-8
         site.data.site.locale: locale of site, ex: en_US
@@ -13,6 +14,11 @@
         site.data.site.neocities: neocities site name
         site.data.site.api_url: URL of site API
 {%- endcomment -%}
+
+{%- assign _description = page.marquee -%}
+{%- unless _description -%}
+    {%- assign _description = page.excerpt | strip_html | normalize_whitespace -%}
+{%- endunless -%}
 
 
 <!DOCTYPE html>
@@ -28,7 +34,7 @@
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="{{ site.data.site.title | escape }}"/>
         <meta property="og:title" content="{{ page.title | escape }}" />
-        <meta property="og:description" content="{{ page.excerpt | strip_html | normalize_whitespace | escape }}" />
+        <meta property="og:description" content="{{ _description | escape }}" />
         <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
         <meta property="og:image" content="{%- include static_url.fn filename='cover.gif' -%}" />
     </head>

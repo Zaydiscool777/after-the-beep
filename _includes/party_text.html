@@ -13,7 +13,7 @@
     {%- if _character == " " -%}
         &nbsp;
     {%- else -%}
-        {{- _character -}}
+        {{- _character | escape -}}
     {%- endif -%}
     </span>
 {%- endfor -%}
