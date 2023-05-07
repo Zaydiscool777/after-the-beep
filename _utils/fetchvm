@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Fetch voicemails from VoIP.ms and store them as collection documents"""
+"""Fetch voicemails from VoIP.ms and store them as collection documents
+Requires pytz and ffmpeg
+"""
 import base64
 import configparser
 import datetime
 import hashlib
 import json
 import os
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -31,6 +34,10 @@ class Config:
         site_config = config_parser['site']
         self.site_document_path = site_config['document_path']
         self.site_audio_path = site_config['audio_path']
+
+        # extract audio settings
+        audio_config = config_parser['audio']
+        self.audio_mp3_profile = int(audio_config['mp3_profile'])
 
         # extract document fields
         try:
@@ -175,6 +182,16 @@ def write_document(path, fields, encoding=FILE_ENCODING):
             document_file.write(f'{field_name}: {field_value}\n')
         document_file.write('---\n')
 
+def convert_wav_to_mp3(wav_path, mp3_path, mp3_profile):
+    """Convert a WAV file to an MP3 file using ffmpeg"""
+    subprocess.check_call(['ffmpeg',
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-i', wav_path,
+        '-acodec', 'libmp3lame',
+        '-q:a', str(mp3_profile),
+        mp3_path])
+
 
 def main():
     config = Config.load()
@@ -196,10 +213,15 @@ def main():
             print(f" -> Received: {message.date}")
             print(f" -> Duration: {message.duration}")
 
-            audio_filename = message.local_id + '.wav'
-            audio_path = os.path.join(config.site_audio_path, audio_filename)
-            print(f" -> Downloading audio to \"{audio_path}\" ...")
-            api.download_audio(message, audio_path)
+            wav_filename = message.local_id + '.wav'
+            wav_path = os.path.join(config.site_audio_path, wav_filename)
+            print(f" -> Downloading audio to \"{wav_path}\" ...")
+            api.download_audio(message, wav_path)
+
+            mp3_filename = message.local_id + '.mp3'
+            mp3_path = os.path.join(config.site_audio_path, mp3_filename)
+            print(f" -> Converting WAV to MP3 \"{mp3_path}\" ...")
+            convert_wav_to_mp3(wav_path, mp3_path, config.audio_mp3_profile)
 
             document_path = os.path.join(
                 config.site_document_path, message.local_id + '.md')
@@ -208,7 +230,7 @@ def main():
                 ('local_id', message.local_id),
                 ('caller_id', message.caller_id),
                 ('date', message.date),
-                ('audio', audio_filename),
+                ('audio', mp3_filename),
                 ('duration', message.duration),
             ] + config.document_fields
             write_document(document_path, document_fields)
@@ -218,7 +240,7 @@ def main():
 
             print(" -> Done.")
 
-    except APIError as error:
+    except (APIError, subprocess.CalledProcessError) as error:
         print('Error: ' + str(error))
         sys.exit(1)
 

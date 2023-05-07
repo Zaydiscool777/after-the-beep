@@ -13,3 +13,7 @@ audio_path = messages
 [document]
 published = true
 memo = New
+
+# audio conversion settings; see https://trac.ffmpeg.org/wiki/Encode/MP3
+[audio]
+mp3_profile = 9
