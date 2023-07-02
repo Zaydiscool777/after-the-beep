@@ -9,3 +9,5 @@
 {%- assign _format = "%Y/%m/%d %l:%M %p %Z" -%}
 
 <time datetime="{{ include.date | date_to_xmlschema }}">{{ include.date | date: _format }}</time>
+
+{%- comment -%}Remove trailing whitespace{%- endcomment -%}

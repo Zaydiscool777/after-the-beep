@@ -301,7 +301,10 @@ var mailbox = (function() {
             // play voicemail when clicked
             mailbox.messages.forEach(function(message) {
                 message.element.addEventListener('click', function(event) {
-                    playMessage(message);
+                    // don't play if the click will result in navigation
+                    if (event.target.tagName !== 'A') {
+                        playMessage(message);
+                    }
                 });
             });
 

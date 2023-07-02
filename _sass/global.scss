@@ -99,6 +99,10 @@ tr.selected {
     color: $table-selected-color;
     background-color: $table-selected-bg-color;
     font-weight: bold;
+
+    a {
+        color: $table-selected-color;
+    }
 }
 
 // controls
