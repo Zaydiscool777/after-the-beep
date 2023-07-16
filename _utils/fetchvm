@@ -213,7 +213,7 @@ def main():
             print(f" -> Received: {message.date}")
             print(f" -> Duration: {message.duration}")
 
-            wav_filename = message.local_id + '.wav'
+            wav_filename = '_' + message.local_id + '.wav'
             wav_path = os.path.join(config.site_audio_path, wav_filename)
             print(f" -> Downloading audio to \"{wav_path}\" ...")
             api.download_audio(message, wav_path)
