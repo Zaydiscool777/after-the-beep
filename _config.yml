@@ -1,6 +1,6 @@
 url: https://afterthebeep.tel
 
-permalink: /:title:output_ext
+permalink: /:title
 timezone: America/New_York
 
 exclude:
