@@ -92,7 +92,7 @@ class API:
             mailbox = message_info['mailbox']
             folder = message_info['folder']
             caller_id = message_info['callerid']
-            message_num = message_info['message_num']
+            message_num = int(message_info['message_num'])
 
             duration = message_info['duration']
             if len(duration) == 8 and duration.startswith('00:0'):
