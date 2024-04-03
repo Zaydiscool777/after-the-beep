@@ -59,15 +59,13 @@ class APIError(Exception):
 
 class Message:
     """A voicemail message"""
-    def __init__(self, local_id, mailbox, folder, message_num, caller_id, date,
-            duration):
+    def __init__(self, local_id, mailbox, folder, message_num, caller_id, date):
         self.local_id = local_id
         self.mailbox = mailbox
         self.folder = folder
         self.message_num = message_num
         self.caller_id = caller_id
         self.date = date
-        self.duration = duration
 
 
 class API:
@@ -94,10 +92,6 @@ class API:
             caller_id = message_info['callerid']
             message_num = int(message_info['message_num'])
 
-            duration = message_info['duration']
-            if len(duration) == 8 and duration.startswith('00:0'):
-              duration = duration[-4:]  # extract trailing M:SS
-
             # parse date and set to timezone of mailbox
             date_str = message_info['date']
             date = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
@@ -108,8 +102,7 @@ class API:
             local_id = hashlib.md5(local_key.encode('utf-8')).hexdigest()
 
             message = Message(
-                local_id, mailbox, folder, message_num, caller_id,
-                date, duration)
+                local_id, mailbox, folder, message_num, caller_id, date)
             messages.append(message)
 
         return messages
@@ -192,6 +185,20 @@ def convert_wav_to_mp3(wav_path, mp3_path, mp3_profile):
         '-q:a', str(mp3_profile),
         mp3_path])
 
+def get_media_duration(media_path):
+    """Get media duration using ffprobe in the format M:SS"""
+    duration = subprocess.check_output(['ffprobe',
+        '-hide_banner',
+        '-loglevel', 'error',
+        '-i', media_path,
+        '-show_entries', 'format=duration',
+        '-output_format', 'csv=p=0',
+        '-sexagesimal'],
+        text=True)
+    hours, minutes, seconds = duration.strip().split(':')
+    whole_seconds = seconds.split('.')[0]
+    return f"{int(minutes)}:{whole_seconds}"
+
 
 def main():
     config = Config.load()
@@ -211,7 +218,6 @@ def main():
             print(f"Message {message.message_num}:")
             print(f" -> From: {message.caller_id}")
             print(f" -> Received: {message.date}")
-            print(f" -> Duration: {message.duration}")
 
             wav_filename = '_' + message.local_id + '.wav'
             wav_path = os.path.join(config.site_audio_path, wav_filename)
@@ -222,6 +228,8 @@ def main():
             mp3_path = os.path.join(config.site_audio_path, mp3_filename)
             print(f" -> Converting WAV to MP3 \"{mp3_path}\" ...")
             convert_wav_to_mp3(wav_path, mp3_path, config.audio_mp3_profile)
+            duration = get_media_duration(mp3_path)
+            print(f" -> Duration: {duration}")
 
             document_path = os.path.join(
                 config.site_document_path, message.local_id + '.md')
@@ -231,7 +239,7 @@ def main():
                 ('caller_id', message.caller_id),
                 ('date', message.date),
                 ('audio', mp3_filename),
-                ('duration', message.duration),
+                ('duration', duration),
             ] + config.document_fields
             write_document(document_path, document_fields)
 
