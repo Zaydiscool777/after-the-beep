@@ -50,7 +50,7 @@ layout: base
             </thead>
             <tbody>
                 {%- for message in site.messages reversed %}
-                <tr class="mailbox-message" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
+                <tr class="mailbox-message" data-id="{{ message.local_id }}" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
                     <td class="mailbox-message-number">{{ forloop.length | minus: forloop.index0 }}</td>
                     <td class="mailbox-message-date">{% include date.html date=message.date %}</td>
                     <td class="mailbox-message-duration">{{ message.duration }}</td>

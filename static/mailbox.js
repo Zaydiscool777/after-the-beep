@@ -119,11 +119,22 @@ var mailbox = (function() {
             mailbox.volumeElement.disabled = !enabled;
         };
 
+        // find message by ID or return null
+        mailbox.findById = function(id) {
+            for (var i = 0; i < mailbox.messages.length; ++i) {
+                var message = mailbox.messages[i];
+                if (message.id === id) {
+                    return message;
+                }
+            }
+            return null;
+        }
+
         // extract fields from message elements
-        var prevMessage = null;
         mailbox.messages = messageElements.map(function(element) {
             var message = {
                 element: element,
+                id: element.getAttribute('data-id'),
                 audioUrl: element.getAttribute('data-audio'),
                 date: element.querySelector('.mailbox-message-date').innerText,
                 memo: element.querySelector('.mailbox-message-memo').innerText,
@@ -218,6 +229,7 @@ var mailbox = (function() {
                 selectedMessage = message;
                 updateControls();
                 mailbox.position(0);
+                window.location.hash = message.id;
             }
 
             // play a message and mark as selected
@@ -335,16 +347,25 @@ var mailbox = (function() {
                 updateControls();
             });
 
-            // select first message if there is one
+            // select initial message
             if (mailbox.messages.length > 0) {
                 mailbox.volume(volume);
                 audio.volume = volume;
                 mailbox.enable(true);
                 mailbox.stop();
 
-                var firstMessage = mailbox.messages[0];
-                selectMessage(firstMessage);
-                loadAudio(firstMessage.audioUrl);
+                // default to first message
+                var initialMessage = mailbox.messages[0];
+
+                // select the message described by the URL hash
+                if (window.location.hash !== '') {
+                    console.log(window.location.hash);
+                    var initialId = window.location.hash.substring(1);
+                    initialMessage = mailbox.findById(initialId) || initialMessage;
+                }
+
+                selectMessage(initialMessage);
+                loadAudio(initialMessage.audioUrl);
             }
         }
     };
