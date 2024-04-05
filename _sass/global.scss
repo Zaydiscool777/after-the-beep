@@ -88,6 +88,21 @@ th {
     font-weight: normal;
     @include outset-border;
 }
+th.selected {
+    @include inset-border;
+}
+th.ascending:after, th.descending:after {
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 8px;
+    height: 9px;
+    margin: 0 0 $narrow-gap $medium-gap;
+    vertical-align: middle;
+}
+th.ascending:after { background-image: url("arrow-ascending.gif"); }
+th.descending:after { background-image: url("arrow-descending.gif"); }
 th, td {
     margin: 0;
     padding: $narrow-gap $medium-gap;

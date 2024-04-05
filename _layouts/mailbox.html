@@ -39,27 +39,33 @@ layout: base
         <input class=" mailbox-volume" type="range" min="0" max="100" value="100" />
     </div>
     <div class="mailbox-messages">
-        <table>
-            <tr>
-                <th class="mailbox-header-narrow">#</th>
-                <th class="mailbox-header-narrow">Date</th>
-                <th class="mailbox-header-narrow">Length</th>
-                <th>Memo</th>
-            </tr>
-            {%- for message in site.messages reversed %}
-            <tr class="mailbox-message" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
-                <td class="mailbox-message-number">{{ forloop.length | minus: forloop.index0 }}</td>
-                <td class="mailbox-message-date">{% include date.html date=message.date %}</td>
-                <td class="mailbox-message-duration">{{ message.duration }}</td>
-                <td class="mailbox-message-memo">{{ message.memo | markdownify | strip_newlines | remove: "<p>" | remove: "</p>" | remove: "\n" }}</td>
-            </tr>
-            {%- endfor %}
+        <table id="mailbox-table" class="mailbox-table" data-sorted-by="0">
+            <thead>
+                <tr>
+                    <th class="mailbox-header-narrow" data-type="number" data-order="descending">#</th>
+                    <th class="mailbox-header-narrow" data-type="time">Date</th>
+                    <th class="mailbox-header-narrow" data-type="duration">Length</th>
+                    <th data-type="text">Memo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%- for message in site.messages reversed %}
+                <tr class="mailbox-message" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
+                    <td class="mailbox-message-number">{{ forloop.length | minus: forloop.index0 }}</td>
+                    <td class="mailbox-message-date">{% include date.html date=message.date %}</td>
+                    <td class="mailbox-message-duration">{{ message.duration }}</td>
+                    <td class="mailbox-message-memo">{{ message.memo | markdownify | strip_newlines | remove: "<p>" | remove: "</p>" | remove: "\n" }}</td>
+                </tr>
+                {%- endfor %}
+            </tbody>
         </table>
     </div>
 </div>
 <script src="{% include static_url.fn filename='mailbox.js' %}"></script>
+<script src="{% include static_url.fn filename='table.js' %}"></script>
 <script>
     (function() {
         mailbox.init('#mailbox');
+        table.init('#mailbox-table');
     })();
 </script>

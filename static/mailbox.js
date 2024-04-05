@@ -35,6 +35,7 @@ var mailbox = (function() {
             nextElement: rootElement.querySelector('.mailbox-next'),
             muteElement: rootElement.querySelector('.mailbox-mute'),
             volumeElement: rootElement.querySelector('.mailbox-volume'),
+            tableElement: rootElement.querySelector('.mailbox-table')
         };
 
         // set and get position timestamp
@@ -122,10 +123,6 @@ var mailbox = (function() {
         var prevMessage = null;
         mailbox.messages = messageElements.map(function(element) {
             var message = {
-                // links to list members
-                prev: prevMessage,
-                next: null,
-
                 element: element,
                 audioUrl: element.getAttribute('data-audio'),
                 date: element.querySelector('.mailbox-message-date').innerText,
@@ -139,12 +136,22 @@ var mailbox = (function() {
                 deselect: function() {
                     element.classList.remove('selected');
                 },
+                // get previous message
+                prev: function() {
+                    if (element.previousElementSibling !== null) {
+                        return element.previousElementSibling.message || null;
+                    }
+                    return null;
+                },
+                // get next message
+                next: function() {
+                    if (element.nextElementSibling !== null) {
+                        return element.nextElementSibling.message || null;
+                    }
+                    return null;
+                }
             };
-            // forward link previous message
-            if (message.prev !== null) {
-                message.prev.next = message;
-            }
-            prevMessage = message;
+            element.message = message;
             return message;
         });
 
@@ -157,6 +164,10 @@ var mailbox = (function() {
 
     return {
         /*
+         * Initialize a mailbox.
+         *
+         * Parameters:
+         *     selector: CSS selector that identifies the mailbox element
          */
         init: function(selector) {
             var mailbox = createMailbox(selector);
@@ -187,6 +198,14 @@ var mailbox = (function() {
                 audio.currentTime = 0.0;
             }
 
+            // update next and previous buttons
+            function updateControls() {
+                mailbox.prevElement.disabled =
+                    selectedMessage === null || selectedMessage.prev() === null;
+                mailbox.nextElement.disabled =
+                    selectedMessage === null || selectedMessage.next() === null;
+            }
+
             // mark message as selected
             function selectMessage(message) {
                 // deselect previous selection
@@ -197,10 +216,7 @@ var mailbox = (function() {
                 // mark new selection
                 message.select();
                 selectedMessage = message;
-
-                // update controls
-                mailbox.prevElement.disabled = (message.prev === null);
-                mailbox.nextElement.disabled = (message.next === null);
+                updateControls();
                 mailbox.position(0);
             }
 
@@ -236,8 +252,11 @@ var mailbox = (function() {
 
             // play previous message
             mailbox.prevElement.addEventListener('click', function(event) {
-                if (selectedMessage !== null && selectedMessage.prev !== null) {
-                    playMessage(selectedMessage.prev);
+                if (selectedMessage !== null) {
+                    var prevMessage = selectedMessage.prev();
+                    if (prevMessage !== null) {
+                        playMessage(prevMessage);
+                    }
                 }
             });
 
@@ -269,8 +288,11 @@ var mailbox = (function() {
 
             // play next message
             mailbox.nextElement.addEventListener('click', function(event) {
-                if (selectedMessage !== null && selectedMessage.next !== null) {
-                    playMessage(selectedMessage.next);
+                if (selectedMessage !== null) {
+                    var nextMessage = selectedMessage.next();
+                    if (nextMessage !== null) {
+                        playMessage(nextMessage);
+                    }
                 }
             });
 
@@ -306,6 +328,11 @@ var mailbox = (function() {
                         playMessage(message);
                     }
                 });
+            });
+
+            // update controls when messages are sorted by table.js
+            mailbox.tableElement.addEventListener('sort', function(event) {
+                updateControls();
             });
 
             // select first message if there is one
