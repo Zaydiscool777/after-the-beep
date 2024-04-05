@@ -181,6 +181,7 @@ var mailbox = (function() {
          *     selector: CSS selector that identifies the mailbox element
          */
         init: function(selector) {
+            var siteTitle = document.title;
             var mailbox = createMailbox(selector);
             var audio = new Audio();
             var selectedMessage = null;
@@ -227,16 +228,28 @@ var mailbox = (function() {
                 // mark new selection
                 message.select();
                 selectedMessage = message;
+
                 updateControls();
                 mailbox.position(0);
+                loadAudio(message.audioUrl);
+
                 window.location.hash = message.id;
+                document.title = message.memo + ' | ' + siteTitle;
             }
 
             // play a message and mark as selected
             function playMessage(message) {
                 selectMessage(message);
-                loadAudio(message.audioUrl);
                 playAudio();
+            }
+
+            // retrieve the message specified in the URL hash
+            function getUrlMessage() {
+                if (window.location.hash !== '') {
+                    var hashId = window.location.hash.substring(1);
+                    return mailbox.findById(hashId);
+                }
+                return null;
             }
 
             // update elements to reflect playback state
@@ -347,6 +360,21 @@ var mailbox = (function() {
                 updateControls();
             });
 
+            // set active message when hash changes
+            window.addEventListener("hashchange", function(event) {
+                // selectMessage() updates the hash which fires this event.
+                // don't select a message if the one in the hash is already selected
+                var hashId = window.location.hash.substring(1);
+                if (hashId === selectedMessage.id) {
+                    return;
+                }
+
+                var urlMessage = getUrlMessage();
+                if (urlMessage !== null) {
+                    selectMessage(urlMessage);
+                }
+            });
+
             // select initial message
             if (mailbox.messages.length > 0) {
                 mailbox.volume(volume);
@@ -355,17 +383,8 @@ var mailbox = (function() {
                 mailbox.stop();
 
                 // default to first message
-                var initialMessage = mailbox.messages[0];
-
-                // select the message described by the URL hash
-                if (window.location.hash !== '') {
-                    console.log(window.location.hash);
-                    var initialId = window.location.hash.substring(1);
-                    initialMessage = mailbox.findById(initialId) || initialMessage;
-                }
-
+                var initialMessage = getUrlMessage() || mailbox.messages[0];
                 selectMessage(initialMessage);
-                loadAudio(initialMessage.audioUrl);
             }
         }
     };
