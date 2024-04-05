@@ -371,6 +371,8 @@ var mailbox = (function() {
 
                 var urlMessage = getUrlMessage();
                 if (urlMessage !== null) {
+                    stopAudio();
+                    mailbox.stop();
                     selectMessage(urlMessage);
                 }
             });
