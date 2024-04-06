@@ -135,7 +135,6 @@ var mailbox = (function() {
             var message = {
                 element: element,
                 id: element.getAttribute('data-id'),
-                audioUrl: element.getAttribute('data-audio'),
                 date: element.querySelector('.mailbox-message-date').innerText,
                 memo: element.querySelector('.mailbox-message-memo').innerText,
 
@@ -179,18 +178,20 @@ var mailbox = (function() {
          *
          * Parameters:
          *     selector: CSS selector that identifies the mailbox element
+         *     audioRoot: path where message audio files are loaded from
          */
-        init: function(selector) {
+        init: function(selector, audioRoot) {
             var siteTitle = document.title;
             var mailbox = createMailbox(selector);
             var audio = new Audio();
             var selectedMessage = null;
             var muted = false;
             var volume = 1.0;
+            audioRoot = audioRoot.replace(/\/+$/, ''); // trim trailing slash
 
-            // load audio from URL
-            function loadAudio(url) {
-                audio.src = url;
+            // load audio from selectedMessage
+            function loadAudio() {
+                audio.src = audioRoot + '/' + selectedMessage.id + '.mp3';
                 audio.load();
             }
 
@@ -231,7 +232,7 @@ var mailbox = (function() {
 
                 updateControls();
                 mailbox.position(0);
-                loadAudio(message.audioUrl);
+                loadAudio();
 
                 window.location.hash = message.id;
                 document.title = message.memo + ' | ' + siteTitle;
@@ -296,7 +297,7 @@ var mailbox = (function() {
                 if (selectedMessage !== null) {
                     // reload audio if there was an error
                     if (audio.error) {
-                        loadAudio(selectedMessage.audioUrl);
+                        loadAudio();
                         playAudio();
                     }
 

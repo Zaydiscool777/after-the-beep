@@ -5,9 +5,10 @@ Requires pytz and ffmpeg
 import base64
 import configparser
 import datetime
-import hashlib
 import json
 import os
+import random
+import string
 import subprocess
 import sys
 import urllib.error
@@ -59,8 +60,7 @@ class APIError(Exception):
 
 class Message:
     """A voicemail message"""
-    def __init__(self, local_id, mailbox, folder, message_num, caller_id, date):
-        self.local_id = local_id
+    def __init__(self, mailbox, folder, message_num, caller_id, date):
         self.mailbox = mailbox
         self.folder = folder
         self.message_num = message_num
@@ -97,12 +97,7 @@ class API:
             date = datetime.datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
             date = timezone.localize(date)
 
-            # generate an ID that uniquely identifies the message locally
-            local_key = f'{mailbox}/{folder}/{caller_id}/{date.timestamp()}'
-            local_id = hashlib.md5(local_key.encode('utf-8')).hexdigest()
-
-            message = Message(
-                local_id, mailbox, folder, message_num, caller_id, date)
+            message = Message(mailbox, folder, message_num, caller_id, date)
             messages.append(message)
 
         return messages
@@ -158,6 +153,14 @@ class API:
         body = response.read().decode(encoding)
         return json.loads(body)
 
+
+def generate_id(length=4):
+    """Generate a string of random alphanumeric characters
+    The total number of values that can be represented is 62^length.
+    """
+    alphabet = string.ascii_letters + string.digits
+    chars = random.choices(alphabet, k=length)
+    return ''.join(chars)
 
 def write_document(path, fields, encoding=FILE_ENCODING):
     """Save fields to a Markdown file as yaml front matter"""
@@ -219,26 +222,32 @@ def main():
             print(f" -> From: {message.caller_id}")
             print(f" -> Received: {message.date}")
 
-            wav_filename = '_' + message.local_id + '.wav'
+            # keep generating IDs until one is found that isn't in use
+            while True:
+                local_id = generate_id()
+                document_path = os.path.join(
+                    config.site_document_path, local_id + '.md')
+                if (not os.path.exists(document_path)):
+                    break
+                print(f" ! Local ID \"{local_id}\" in use, generating another")
+
+            wav_filename = '_' + local_id + '.wav'
             wav_path = os.path.join(config.site_audio_path, wav_filename)
             print(f" -> Downloading audio to \"{wav_path}\" ...")
             api.download_audio(message, wav_path)
 
-            mp3_filename = message.local_id + '.mp3'
+            mp3_filename = local_id + '.mp3'
             mp3_path = os.path.join(config.site_audio_path, mp3_filename)
             print(f" -> Converting WAV to MP3 \"{mp3_path}\" ...")
             convert_wav_to_mp3(wav_path, mp3_path, config.audio_mp3_profile)
             duration = get_media_duration(mp3_path)
             print(f" -> Duration: {duration}")
 
-            document_path = os.path.join(
-                config.site_document_path, message.local_id + '.md')
             print(f" -> Saving metadata to \"{document_path}\" ...")
             document_fields = [
-                ('local_id', message.local_id),
+                ('local_id', local_id),
                 ('caller_id', message.caller_id),
                 ('date', message.date),
-                ('audio', mp3_filename),
                 ('duration', duration),
             ] + config.document_fields
             write_document(document_path, document_fields)

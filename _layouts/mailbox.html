@@ -50,7 +50,7 @@ layout: base
             </thead>
             <tbody>
                 {%- for message in site.messages reversed %}
-                <tr class="mailbox-message" data-id="{{ message.local_id }}" data-audio="{{ site.baseurl }}/messages/{{ message.audio }}">
+                <tr class="mailbox-message" data-id="{{ message.local_id }}">
                     <td class="mailbox-message-number">{{ forloop.length | minus: forloop.index0 }}</td>
                     <td class="mailbox-message-date">{% include date.html date=message.date %}</td>
                     <td class="mailbox-message-duration">{{ message.duration }}</td>
@@ -65,7 +65,7 @@ layout: base
 <script src="{% include static_url.fn filename='table.js' %}"></script>
 <script>
     (function() {
-        mailbox.init('#mailbox');
+        mailbox.init('#mailbox', '{{ site.baseurl }}/messages/');
         table.init('#mailbox-table');
     })();
 </script>
