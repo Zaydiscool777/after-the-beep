@@ -14,7 +14,7 @@
         margin: 0 $narrow-gap;
         background: url("marquee-bg.gif") $marquee-bg-color;
         font-size: 32px;
-        line-height: 48px;
+        line-height: 44px;
         @include inset-border;
     }
     &-letter {
