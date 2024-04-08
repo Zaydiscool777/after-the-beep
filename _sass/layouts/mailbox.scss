@@ -120,6 +120,7 @@
         flex: 1 1 auto;
         margin-bottom: $narrow-gap;
         white-space: nowrap;
+        scroll-padding-top: 24px;
         @include scroll-wrapper;
         @include inset-border;
     }

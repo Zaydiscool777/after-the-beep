@@ -141,6 +141,7 @@ var mailbox = (function() {
                 // mark selected
                 select: function() {
                     element.classList.add('selected');
+                    element.scrollIntoView({block: 'nearest', inline: 'nearest'});
                 },
                 // unmark selected
                 deselect: function() {
@@ -221,12 +222,9 @@ var mailbox = (function() {
 
             // mark message as selected
             function selectMessage(message) {
-                // deselect previous selection
                 if (selectedMessage !== null) {
                     selectedMessage.deselect();
                 }
-
-                // mark new selection
                 message.select();
                 selectedMessage = message;
 
