@@ -1,5 +1,10 @@
 .mailbox {
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: auto;
+
     &-number {
+        flex: none;
         display: block;
         margin: $wide-gap auto;
         text-align: center;
@@ -46,12 +51,13 @@
         &.error { background-image: url("error.gif"); }
     }
     &-controls {
+        flex: none;
         display: flex;
         flex-flow: row nowrap;
         justify-content: center;
         align-items: center;
         gap: $narrow-gap;
-        margin: $medium-gap $narrow-gap;
+        margin: 0 $narrow-gap $medium-gap;
     }
     &-state {
         margin-right: $medium-gap;
@@ -111,9 +117,14 @@
         width: 0;
     }
     &-messages {
-        margin: $narrow-gap 0;
+        flex: 1 1 auto;
+        margin-bottom: $narrow-gap;
         white-space: nowrap;
         @include scroll-wrapper;
         @include inset-border;
+    }
+    &-header {
+        position: sticky;
+        top: 0;
     }
 }

@@ -1,8 +1,9 @@
-
 // site layout
 .base {
     position: relative;
-    max-width: $column-width;
+    box-sizing: border-box;
+    max-width: 2 * $wide-gap + $column-width;
+    min-height: 2 * $wide-gap + $column-height;
     margin: 0 auto;
     padding: $wide-gap;
 
@@ -25,8 +26,11 @@
         @include outset-border;
     }
     &-window {
+        display: flex;
+        flex-flow: column nowrap;
         background-color: $window-bg-color;
-        margin-bottom: $narrow-gap;
+        box-sizing: border-box;
+        max-height: 100%;
         padding: $narrow-gap;
         @include outset-border;
     }
@@ -41,13 +45,18 @@
     }
 
     &-header {
+        flex: none;
     }
 
     &-body {
-        margin: $narrow-gap 0;
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-flow: column nowrap;
     }
 
     &-footer {
+        flex: none;
         display: flex;
         flex-flow: row nowrap;
         align-items: stretch;
@@ -60,11 +69,5 @@
         flex: 1 1 auto;
         padding: $narrow-gap;
         @include inset-border;
-    }
-    &-notice {
-
-    }
-    &-counter {
-
     }
 }
