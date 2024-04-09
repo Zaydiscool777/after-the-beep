@@ -2,6 +2,14 @@
  * Voicemail player
  */
 var mailbox = (function() {
+    // format a second duration to m:ss
+    function formatDuration(duration) {
+        duration = Math.floor(duration);
+        var minutes = Math.floor(duration / 60);
+        var seconds = duration % 60;
+        return minutes + ':' + seconds.toString().padStart(2, '0');
+    }
+
     // create an object representing the mailbox DOM
     function createMailbox(selector) {
         var rootElement = document.querySelector(selector);
@@ -9,16 +17,8 @@ var mailbox = (function() {
         var stateElement = rootElement.querySelector('.mailbox-state');
         var positionElement = rootElement.querySelector('.mailbox-position');
         var durationElement = rootElement.querySelector('.mailbox-duration');
-        var messageElements = Array.prototype.slice.call(
-            rootElement.querySelectorAll('.mailbox-message'));
-
-        // format a second duration to m:ss
-        function formatDuration(duration) {
-            duration = Math.floor(duration);
-            var minutes = Math.floor(duration / 60);
-            var seconds = duration % 60;
-            return minutes + ':' + seconds.toString().padStart(2, '0');
-        }
+        var tableElement = rootElement.querySelector('.mailbox-table');
+        var rowElements = Array.from(tableElement.tBodies[0].children);
 
         // set state class of state element
         function setState(state) {
@@ -35,7 +35,9 @@ var mailbox = (function() {
             nextElement: rootElement.querySelector('.mailbox-next'),
             muteElement: rootElement.querySelector('.mailbox-mute'),
             volumeElement: rootElement.querySelector('.mailbox-volume'),
-            tableElement: rootElement.querySelector('.mailbox-table')
+            tableElement: tableElement,
+            rowElements: rowElements,
+            messageMap: new Map()
         };
 
         // set and get position timestamp
@@ -119,51 +121,46 @@ var mailbox = (function() {
             mailbox.volumeElement.disabled = !enabled;
         };
 
-        // find message by ID or return null
-        mailbox.findById = function(id) {
-            for (var i = 0; i < mailbox.messages.length; ++i) {
-                var message = mailbox.messages[i];
-                if (message.id === id) {
-                    return message;
-                }
-            }
-            return null;
-        }
-
         // extract fields from message elements
-        mailbox.messages = messageElements.map(function(element) {
+        rowElements.forEach(function(element) {
             var message = {
                 element: element,
                 id: element.getAttribute('data-id'),
                 date: element.querySelector('.mailbox-message-date').innerText,
                 memo: element.querySelector('.mailbox-message-memo').innerText,
-
-                // mark selected
-                select: function() {
-                    element.classList.add('selected');
-                    element.scrollIntoView({block: 'nearest', inline: 'nearest'});
-                },
-                // unmark selected
-                deselect: function() {
-                    element.classList.remove('selected');
-                },
-                // get previous message
-                prev: function() {
-                    if (element.previousElementSibling !== null) {
-                        return element.previousElementSibling.message || null;
-                    }
-                    return null;
-                },
-                // get next message
-                next: function() {
-                    if (element.nextElementSibling !== null) {
-                        return element.nextElementSibling.message || null;
-                    }
-                    return null;
-                }
             };
+
+            // mark selected
+            message.select = function() {
+                element.classList.add('selected');
+                element.scrollIntoView({block: 'nearest', inline: 'nearest'});
+            };
+
+            // unmark selected
+            message.deselect = function() {
+                element.classList.remove('selected');
+            };
+
+            // get previous message
+            message.prev = function() {
+                if (element.previousElementSibling !== null) {
+                    return element.previousElementSibling.message || null;
+                }
+                return null;
+            };
+
+            // get next message
+            message.next = function() {
+                if (element.nextElementSibling !== null) {
+                    return element.nextElementSibling.message || null;
+                }
+                return null;
+            };
+
+            // attach the message to the row element for handlers to use
             element.message = message;
-            return message;
+
+            mailbox.messageMap.set(message.id, message);
         });
 
         // set default state
@@ -246,7 +243,7 @@ var mailbox = (function() {
             function getUrlMessage() {
                 if (window.location.hash !== '') {
                     var hashId = window.location.hash.substring(1);
-                    return mailbox.findById(hashId);
+                    return mailbox.messageMap.get(hashId);
                 }
                 return null;
             }
@@ -344,12 +341,12 @@ var mailbox = (function() {
                 }
             });
 
-            // play voicemail when clicked
-            mailbox.messages.forEach(function(message) {
-                message.element.addEventListener('click', function(event) {
+            // play voicemail when row is clicked
+            mailbox.rowElements.forEach(function(element) {
+                element.addEventListener('click', function(event) {
                     // don't play if the click will result in navigation
                     if (event.target.tagName !== 'A') {
-                        playMessage(message);
+                        playMessage(element.message);
                     }
                 });
             });
@@ -377,14 +374,14 @@ var mailbox = (function() {
             });
 
             // select initial message
-            if (mailbox.messages.length > 0) {
+            if (mailbox.rowElements.length > 0) {
                 mailbox.volume(volume);
                 audio.volume = volume;
                 mailbox.enable(true);
                 mailbox.stop();
 
                 // default to first message
-                var initialMessage = getUrlMessage() || mailbox.messages[0];
+                var initialMessage = getUrlMessage() || mailbox.rowElements[0].message;
                 selectMessage(initialMessage);
             }
         }
