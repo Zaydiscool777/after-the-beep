@@ -126,8 +126,7 @@ var mailbox = (function() {
             var message = {
                 element: element,
                 id: element.getAttribute('data-id'),
-                date: element.querySelector('.mailbox-message-date').innerText,
-                memo: element.querySelector('.mailbox-message-memo').innerText,
+                memo: element.querySelector('.mailbox-message-memo').innerText
             };
 
             // mark selected
@@ -357,7 +356,7 @@ var mailbox = (function() {
             });
 
             // set active message when hash changes
-            window.addEventListener("hashchange", function(event) {
+            window.addEventListener('hashchange', function(event) {
                 // selectMessage() updates the hash which fires this event.
                 // don't select a message if the one in the hash is already selected
                 var hashId = window.location.hash.substring(1);
@@ -374,16 +373,18 @@ var mailbox = (function() {
             });
 
             // select initial message
-            if (mailbox.rowElements.length > 0) {
-                mailbox.volume(volume);
-                audio.volume = volume;
-                mailbox.enable(true);
-                mailbox.stop();
+            window.addEventListener('load', function(event) {
+                if (mailbox.rowElements.length > 0) {
+                    mailbox.volume(volume);
+                    audio.volume = volume;
+                    mailbox.enable(true);
+                    mailbox.stop();
 
-                // default to first message
-                var initialMessage = getUrlMessage() || mailbox.rowElements[0].message;
-                selectMessage(initialMessage);
-            }
+                    // default to first message
+                    var initialMessage = getUrlMessage() || mailbox.rowElements[0].message;
+                    selectMessage(initialMessage);
+                }
+            });
         }
     };
 })();
