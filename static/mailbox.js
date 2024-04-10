@@ -130,9 +130,12 @@ var mailbox = (function() {
             };
 
             // mark selected
-            message.select = function() {
+            message.select = function(alignTop) {
                 element.classList.add('selected');
-                element.scrollIntoView({block: 'nearest', inline: 'nearest'});
+                element.scrollIntoView({
+                    block: alignTop ? 'start' : 'nearest',
+                    inline: 'nearest'
+                });
             };
 
             // unmark selected
@@ -217,11 +220,11 @@ var mailbox = (function() {
             }
 
             // mark message as selected
-            function selectMessage(message) {
+            function selectMessage(message, alignTop) {
                 if (selectedMessage !== null) {
                     selectedMessage.deselect();
                 }
-                message.select();
+                message.select(alignTop);
                 selectedMessage = message;
 
                 updateControls();
@@ -234,7 +237,7 @@ var mailbox = (function() {
 
             // play a message and mark as selected
             function playMessage(message) {
-                selectMessage(message);
+                selectMessage(message, false);
                 playAudio();
             }
 
@@ -368,7 +371,7 @@ var mailbox = (function() {
                 if (urlMessage !== null) {
                     stopAudio();
                     mailbox.stop();
-                    selectMessage(urlMessage);
+                    selectMessage(urlMessage, false);
                 }
             });
 
@@ -382,7 +385,7 @@ var mailbox = (function() {
 
                     // default to first message
                     var initialMessage = getUrlMessage() || mailbox.rowElements[0].message;
-                    selectMessage(initialMessage);
+                    selectMessage(initialMessage, true);
                 }
             });
         }
