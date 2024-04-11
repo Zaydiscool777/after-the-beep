@@ -120,12 +120,17 @@
         flex: 1 1 auto;
         margin-bottom: $narrow-gap;
         white-space: nowrap;
-        scroll-padding-top: 24px;
+        // this padding ensures there will be one message before or after the
+        // selection visible to indicate there are more messages available
+        scroll-padding: 46px 0 22px;
         @include scroll-wrapper;
         @include inset-border;
     }
     &-header {
         position: sticky;
         top: 0;
+    }
+    &-message {
+        height: 22px;
     }
 }
