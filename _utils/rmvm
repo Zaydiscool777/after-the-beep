@@ -1,0 +1,32 @@
+#!/bin/sh
+# Remove a single voicemail by ID
+# Usage: rmvm <id>
+CONFIG_FILE=_utils/fetchvm.conf
+
+
+extract_config_value() {
+    file=$1
+    key=$2
+    sed -n "s/^$key = //p" "$file"
+}
+
+
+id=$1
+if [ -z "$id" ]; then
+    echo "Message ID argument is missing"
+    exit 1
+fi
+
+audio_path=$(extract_config_value "$CONFIG_FILE" audio_path)
+if [ -z "$audio_path" ]; then
+    echo "Audio path not found in config"
+    exit 1
+fi
+
+document_path=$(extract_config_value "$CONFIG_FILE" document_path)
+if [ -z "$document_path" ]; then
+    echo "Document path not found in config"
+    exit 1
+fi
+
+rm "$audio_path/_$id.wav" "$audio_path/$id.mp3" "$document_path/$id.md"
