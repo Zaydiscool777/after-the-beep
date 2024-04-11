@@ -22,8 +22,15 @@
     $scrollbar-size: 16px;
 
     overflow: auto;
-    scrollbar-color: $window-bg-color $scrollbar-bg-color;
+    scrollbar-color: $scrollbar-handle-color $scrollbar-bg-color;
     scrollbar-width: auto;
+
+    // Chrome 121+ supports scrollbar-color and will disable ::-webkit styles
+    // if not "auto"; this disables the color override if styles are supported
+    // see https://syntackle.com/blog/changes-to-scrollbar-styling-in-chrome-121/
+    @supports #{'selector(::-webkit-scrollbar)'} {
+        & { scrollbar-color: auto; }
+    }
 
     &::-webkit-scrollbar {
         width: $scrollbar-size;
