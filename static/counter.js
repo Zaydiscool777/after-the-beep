@@ -3,8 +3,6 @@
  * This script requires the use of a CORS proxy to be used on Neocities pages.
  */
 var counter = (function() {
-    var INFO_PATH_TEMPLATE = '/info?sitename={siteName}';
-
     // make an async HTTP GET request
     function sendRequest(method, url, onDone) {
         var request = new XMLHttpRequest();
@@ -43,8 +41,13 @@ var counter = (function() {
          */
         init: function(selector, renderFunction, apiUrl, siteName) {
             var rootElement = document.querySelector(selector);
-            var infoPath = INFO_PATH_TEMPLATE.replace('{siteName}', siteName);
-            var infoUrl = apiUrl + infoPath;
+            var infoUrl = apiUrl + '/info?sitename=' + siteName;
+
+            // add some rudimentary tracking information
+            if (document.referrer !== '') {
+                infoUrl += '&referrer=' + encodeURIComponent(document.referrer);
+            }
+
             sendRequest('GET', infoUrl, function(request) {
                 var json = JSON.parse(request.responseText);
                 var viewCount = json.info.views;
