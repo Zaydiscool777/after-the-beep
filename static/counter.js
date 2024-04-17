@@ -52,7 +52,8 @@ var counter = (function() {
 
             // add analytics information
             var headers = [
-                ['X-Document-Referrer', document.referrer]
+                ['X-Document-Referrer', document.referrer],
+                ['X-Document-Location', window.location.href]
             ];
 
             sendRequest('GET', infoUrl, headers, function(request) {
