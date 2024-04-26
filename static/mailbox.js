@@ -179,14 +179,16 @@ var mailbox = (function() {
          * Parameters:
          *     selector: CSS selector that identifies the mailbox element
          *     audioRoot: path where message audio files are loaded from
+         *     onPlay: callback that gets fired when a message is played
          */
-        init: function(selector, audioRoot) {
+        init: function(selector, audioRoot, onPlay) {
             var siteTitle = document.title;
             var mailbox = createMailbox(selector);
             var audio = new Audio();
             var selectedMessage = null;
             var muted = false;
             var volume = 1.0;
+            var playing = false;
             audioRoot = audioRoot.replace(/\/+$/, ''); // trim trailing slash
 
             // load audio from selectedMessage
@@ -224,8 +226,10 @@ var mailbox = (function() {
                 if (selectedMessage !== null) {
                     selectedMessage.deselect();
                 }
+
                 message.select(alignTop);
                 selectedMessage = message;
+                playing = false;
 
                 updateControls();
                 mailbox.position(0);
@@ -251,9 +255,24 @@ var mailbox = (function() {
             }
 
             // update elements to reflect playback state
-            audio.addEventListener('playing', mailbox.play, true);
+            audio.addEventListener('playing', function(event) {
+                mailbox.play();
+
+                // fire only on the first play after loading to prevent firing
+                // when scrubbing or repeatedly playing/pausing
+                if (typeof onPlay !== 'undefined' && !playing) {
+                    onPlay({
+                        "id": selectedMessage.id,
+                        "memo": selectedMessage.memo
+                    });
+                    playing = true;
+                }
+            }, true);
             audio.addEventListener('pause', mailbox.pause, true);
-            audio.addEventListener('ended', mailbox.pause, true);
+            audio.addEventListener('ended', function(event) {
+                playing = false;
+                mailbox.pause();
+            }, true);
 
             // update seek slider to reflect playback position
             audio.addEventListener('loadedmetadata', function(event) {
@@ -287,6 +306,7 @@ var mailbox = (function() {
             mailbox.stopElement.addEventListener('click', function(event) {
                 stopAudio();
                 mailbox.stop();
+                playing = false;
             });
 
             // toggle playback

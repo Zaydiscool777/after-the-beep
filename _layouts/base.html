@@ -11,8 +11,10 @@
         site.data.site.title: site title placed in head>title tag
         site.data.site.owner: name of site owner
         site.data.site.email: email address of site owner
-        site.data.site.neocities: neocities site name
+        site.data.site.privacy_policy: URL of privacy policy page
         site.data.site.api_url: URL of site API
+        site.data.site.neocities: neocities site name
+        site.data.site.umami_id: umami site ID
 {%- endcomment -%}
 
 {%- assign _description = page.marquee -%}
@@ -37,6 +39,7 @@
         <meta property="og:description" content="{{ _description | escape }}" />
         <meta property="og:url" content="{{ site.url }}{{ site.baseurl }}{{ page.url }}" />
         <meta property="og:image" content="{%- include static_url.fn filename='cover.gif' -%}" />
+        <script defer src="{{ site.data.site.api_url }}/stats/script.js" data-website-id="{{ site.data.site.umami_id }}"></script>
     </head>
     <body class="base">
         <noscript class="base-noscript">This website uses JavaScript to play audio.<br/>Please enable scripting for the full experience.</noscript>
@@ -48,7 +51,8 @@
             <footer class="base-footer">
                 <div class="base-notice">
                     <span>Site is <a href="{{ site.data.site.source_repo }}">open source</a>.</span>
-                    <span>Contact <a href="mailto:{{ site.data.site.email }}">{{ site.data.site.owner }}</a> with questions.</span>
+                    <span>Contact <a href="mailto:{{ site.data.site.email }}">{{ site.data.site.owner }}</a>.</span>
+                    <span>See <a href="{{ site.data.site.privacy_policy }}">privacy policy</a>.</span>
                 </div>
                 <div class="base-counter">Visitors: <a id="counter" href="https://neocities.org/site/{{ site.data.site.neocities }}"></a></div>
             </footer>

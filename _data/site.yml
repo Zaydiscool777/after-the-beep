@@ -3,10 +3,12 @@ locale: en_US
 
 title: After the Beep
 number: '+14426672337'
-owner: the operator
+owner: operator
 email: operator@afterthebeep.tel
 
 source_repo: https://gitlab.com/unixispower/after-the-beep
+privacy_policy: https://blaines.world/privacy
 
 api_url: https://api.blaines.world
 neocities: afterthebeep
+umami_id: 8314f88e-10fc-48bd-8cdf-8d3d54f5b707

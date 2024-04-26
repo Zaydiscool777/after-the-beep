@@ -65,7 +65,9 @@ layout: base
 <script src="{% include static_url.fn filename='table.js' %}"></script>
 <script>
     (function() {
-        mailbox.init('#mailbox', '{{ site.baseurl }}/messages/');
+        mailbox.init('#mailbox', '{{ site.baseurl }}/messages/', function(message) {
+            umami.track('Message.' + message.id + ': ' + message.memo);
+        });
         table.init('#mailbox-table');
     })();
 </script>

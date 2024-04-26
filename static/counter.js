@@ -4,7 +4,7 @@
  */
 var counter = (function() {
     // make an async HTTP request
-    function sendRequest(method, url, headers, onDone) {
+    function sendRequest(method, url, onDone) {
         var request = new XMLHttpRequest();
         request.onreadystatechange = function() {
             if (request.readyState == request.DONE && request.status === 200) {
@@ -12,13 +12,6 @@ var counter = (function() {
             }
         };
         request.open(method, url, true);
-        for (var i = 0; i < headers.length; ++i) {
-            var name = headers[i][0];
-            var value = headers[i][1];
-            if (value !== '') {
-                request.setRequestHeader(name, value);
-            }
-        }
         request.send();
     }
 
@@ -49,14 +42,7 @@ var counter = (function() {
         init: function(selector, renderFunction, apiUrl, siteName) {
             var rootElement = document.querySelector(selector);
             var infoUrl = apiUrl + '/info?sitename=' + siteName;
-
-            // add analytics information
-            var headers = [
-                ['X-Document-Referrer', document.referrer],
-                ['X-Document-Location', window.location.href]
-            ];
-
-            sendRequest('GET', infoUrl, headers, function(request) {
+            sendRequest('GET', infoUrl, function(request) {
                 var json = JSON.parse(request.responseText);
                 var viewCount = json.info.views;
                 var countDigits = viewCount.toString().split('');
