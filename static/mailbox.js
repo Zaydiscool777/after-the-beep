@@ -262,8 +262,8 @@ var mailbox = (function() {
                 // when scrubbing or repeatedly playing/pausing
                 if (typeof onPlay !== 'undefined' && !playing) {
                     onPlay({
-                        "id": selectedMessage.id,
-                        "memo": selectedMessage.memo
+                        id: selectedMessage.id,
+                        memo: selectedMessage.memo
                     });
                     playing = true;
                 }
