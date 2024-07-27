@@ -246,9 +246,10 @@ var mailbox = (function() {
             }
 
             // retrieve the message specified in the URL hash
-            function getUrlMessage() {
-                if (window.location.hash !== '') {
-                    var hashId = window.location.hash.substring(1);
+            function getUrlMessage(hash) {
+                hash = hash || window.location.hash;
+                if (hash !== '') {
+                    var hashId = hash.substring(1);
                     return mailbox.messageMap.get(hashId);
                 }
                 return null;
@@ -366,9 +367,17 @@ var mailbox = (function() {
             // play voicemail when row is clicked
             mailbox.rowElements.forEach(function(element) {
                 element.addEventListener('click', function(event) {
-                    // don't play if the click will result in navigation
+                    var href = event.target.getAttribute('href');
+
+                    // play on message click
                     if (event.target.tagName !== 'A') {
                         playMessage(element.message);
+
+                    // play referenced message for fragment links
+                    } else if (href.startsWith('#')) {
+                        event.preventDefault();
+                        var message = getUrlMessage(href);
+                        playMessage(message);
                     }
                 });
             });
