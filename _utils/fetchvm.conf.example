@@ -14,6 +14,9 @@ audio_path = messages
 published = true
 memo = New
 
-# audio conversion settings; see https://trac.ffmpeg.org/wiki/Encode/MP3
+# audio conversion settings
 [audio]
+# see https://trac.ffmpeg.org/wiki/Encode/MP3
 mp3_profile = 9
+# see https://ffmpeg.org/ffmpeg-filters.html
+filters = anull

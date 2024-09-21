@@ -39,6 +39,7 @@ class Config:
         # extract audio settings
         audio_config = config_parser['audio']
         self.audio_mp3_profile = int(audio_config['mp3_profile'])
+        self.audio_filters = audio_config['filters']
 
         # extract document fields
         try:
@@ -178,12 +179,13 @@ def write_document(path, fields, encoding=FILE_ENCODING):
             document_file.write(f'{field_name}: {field_value}\n')
         document_file.write('---\n')
 
-def convert_wav_to_mp3(wav_path, mp3_path, mp3_profile):
+def convert_wav_to_mp3(wav_path, mp3_path, mp3_profile, filters):
     """Convert a WAV file to an MP3 file using ffmpeg"""
     subprocess.check_call(['ffmpeg',
         '-hide_banner',
         '-loglevel', 'error',
         '-i', wav_path,
+        '-filter:a', filters,
         '-acodec', 'libmp3lame',
         '-q:a', str(mp3_profile),
         mp3_path])
@@ -239,7 +241,8 @@ def main():
             mp3_filename = local_id + '.mp3'
             mp3_path = os.path.join(config.site_audio_path, mp3_filename)
             print(f" -> Converting WAV to MP3 \"{mp3_path}\" ...")
-            convert_wav_to_mp3(wav_path, mp3_path, config.audio_mp3_profile)
+            convert_wav_to_mp3(wav_path, mp3_path,
+                config.audio_mp3_profile, config.audio_filters)
             duration = get_media_duration(mp3_path)
             print(f" -> Duration: {duration}")
 
@@ -257,7 +260,8 @@ def main():
 
             print(" -> Done.")
 
-    except (APIError, subprocess.CalledProcessError) as error:
+    except (APIError, subprocess.CalledProcessError,
+            urllib.error.URLError) as error:
         print('Error: ' + str(error))
         sys.exit(1)
 

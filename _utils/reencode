@@ -1,0 +1,40 @@
+#!/bin/sh
+# Re-encode all WAV files into MP3s
+CONFIG_FILE=_utils/fetchvm.conf
+
+
+extract_config_value() {
+    file=$1
+    key=$2
+    sed -n "s/^$key = //p" "$file"
+}
+
+
+audio_path=$(extract_config_value "$CONFIG_FILE" audio_path)
+if [ -z "$audio_path" ]; then
+    echo "Audio path not found in config"
+    exit 1
+fi
+
+filters=$(extract_config_value "$CONFIG_FILE" filters)
+if [ -z "$filters" ]; then
+    echo "Audio filters not found in config"
+    exit 1
+fi
+
+mp3_profile=$(extract_config_value "$CONFIG_FILE" mp3_profile)
+if [ -z "$mp3_profile" ]; then
+    echo "MP3 profile not found in config"
+    exit 1
+fi
+
+for wav_file in "$audio_path"/*.wav; do
+    message_id=$(basename "$wav_file" .wav | sed -e "s/^_//")
+    mp3_file="$audio_path/test_$message_id.mp3"
+    echo "$wav_file -> $mp3_file"
+
+    ffmpeg -y -hide_banner -loglevel error \
+        -i "$wav_file" -filter:a "$filters" \
+        '-acodec' 'libmp3lame' '-q:a' "$mp3_profile" \
+        "$mp3_file"
+done
